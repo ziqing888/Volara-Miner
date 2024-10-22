@@ -24,22 +24,22 @@ LOG_FILE="/var/log/dusk_script.log"
 # 信息显示函数
 log_info() {
   echo -e "${CYAN}${INFO_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [INFO] ${1}" >> "${LOG_FILE}"
+  echo "$(date +'%Y-%m-%d %H:%M:%S') [信息] ${1}" >> "${LOG_FILE}"
 }
 
 log_success() {
   echo -e "${GREEN}${SUCCESS_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [SUCCESS] ${1}" >> "${LOG_FILE}"
+  echo "$(date +'%Y-%m-%d %H:%M:%S') [成功] ${1}" >> "${LOG_FILE}"
 }
 
 log_warning() {
   echo -e "${YELLOW}${WARNING_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [WARNING] ${1}" >> "${LOG_FILE}"
+  echo "$(date +'%Y-%m-%d %H:%M:%S') [警告] ${1}" >> "${LOG_FILE}"
 }
 
 log_error() {
   echo -e "${RED}${ERROR_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [ERROR] ${1}" >> "${LOG_FILE}"
+  echo "$(date +'%Y-%m-%d %H:%M:%S') [错误] ${1}" >> "${LOG_FILE}"
 }
 
 # 函数：更新和升级系统
@@ -78,20 +78,23 @@ install_docker() {
 
 # 函数：启动 Volara-Miner
 start_miner() {
+  log_info "请确保你的 Vana 网络钱包有足够的测试代币。访问水龙头：https://faucet.vana.org/moksha 领取测试代币。"
+  echo -e "${YELLOW}提示：请检查你的 Vana 网络余额。领取 Moksha 测试代币后继续。${RESET}"
+  
+  read -sp "$(echo -e "${YELLOW}请输入你的 Metamask 私钥（不会显示在屏幕上）：${RESET}")" VANA_PRIVATE_KEY
+  export VANA_PRIVATE_KEY
+
+  if [[ -z "$VANA_PRIVATE_KEY" ]]; then
+    log_error "Metamask 私钥不能为空。请重新运行脚本并输入有效的私钥。"
+    exit 1
+  fi
+
   log_info "正在拉取 Volara-Miner Docker 镜像..."
   docker pull volara/miner &> /dev/null
   if [[ $? -eq 0 ]]; then
     log_success "Volara-Miner Docker 镜像拉取成功。"
   else
     log_error "拉取 Volara-Miner Docker 镜像失败。"
-    exit 1
-  fi
-
-  read -sp "$(echo -e "${YELLOW}请输入你的 Metamask 私钥（不会显示在屏幕上）：${RESET}")" VANA_PRIVATE_KEY
-  export VANA_PRIVATE_KEY
-
-  if [[ -z "$VANA_PRIVATE_KEY" ]]; then
-    log_error "Metamask 私钥不能为空。请重新运行脚本并输入有效的私钥。"
     exit 1
   fi
 
@@ -104,12 +107,6 @@ start_miner() {
   log_success "设置完成！你可以通过访问 https://volara.xyz/ 查看你的挖矿积分。"
 }
 
-# 函数：查看日志
-view_logs() {
-  log_info "显示最近的 20 行日志..."
-  tail -n 20 "$LOG_FILE"
-}
-
 # 主菜单函数
 show_menu() {
   clear
@@ -117,10 +114,9 @@ show_menu() {
   echo "1. 更新和升级系统"
   echo "2. 安装 Docker"
   echo "3. 启动 Volara-Miner"
-  echo "4. 查看日志"
-  echo "5. 退出"
+  echo "4. 退出"
   echo -e "${BOLD}===========================================================${RESET}"
-  echo -n "请选择一个选项 [1-5]："
+  echo -n "请选择一个选项 [1-4]："
 }
 
 # 主循环
@@ -138,9 +134,6 @@ while true; do
       start_miner
       ;;
     4)
-      view_logs
-      ;;
-    5)
       log_info "正在退出脚本，再见！"
       exit 0
       ;;
