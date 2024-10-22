@@ -112,6 +112,7 @@ view_logs() {
 
 # 主菜单函数
 show_menu() {
+  clear
   echo -e "${BOLD}${BLUE}==================== Volara-Miner 设置 ====================${RESET}"
   echo "1. 更新和升级系统"
   echo "2. 安装 Docker"
