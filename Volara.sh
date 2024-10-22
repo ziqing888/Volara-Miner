@@ -107,6 +107,18 @@ start_miner() {
   log_success "设置完成！你可以通过访问 https://volara.xyz/ 查看你的挖矿积分。"
 }
 
+# 函数：查看 Volara-Miner 日志
+view_miner_logs() {
+  clear
+  log_info "显示 Volara-Miner 运行的日志..."
+  docker ps --filter "ancestor=volara/miner" --format "{{.Names}}" | while read container_name
+  do
+    echo "日志来自容器: $container_name"
+    docker logs --tail 20 "$container_name"
+    echo "--------------------------------------"
+  done
+}
+
 # 主菜单函数
 show_menu() {
   clear
@@ -114,9 +126,10 @@ show_menu() {
   echo "1. 更新和升级系统"
   echo "2. 安装 Docker"
   echo "3. 启动 Volara-Miner"
-  echo "4. 退出"
+  echo "4. 查看 Volara-Miner 运行日志"  # 新增查看日志的选项
+  echo "5. 退出"
   echo -e "${BOLD}===========================================================${RESET}"
-  echo -n "请选择一个选项 [1-4]："
+  echo -n "请选择一个选项 [1-5]："
 }
 
 # 主循环
@@ -134,6 +147,9 @@ while true; do
       start_miner
       ;;
     4)
+      view_miner_logs  # 调用查看日志的函数
+      ;;
+    5)
       log_info "正在退出脚本，再见！"
       exit 0
       ;;
