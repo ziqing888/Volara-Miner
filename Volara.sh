@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# 下载并显示 Logo
-curl -s https://raw.githubusercontent.com/ziqing888/logo.sh/refs/heads/main/logo.sh | bash
-sleep 3
-
 # 自动化脚本：Volara-Miner 安装和启动
 
 # 定义颜色代码
@@ -126,7 +122,9 @@ view_miner_logs() {
 # 主菜单函数
 show_menu() {
   clear
-  echo -e "${BOLD}${BLUE}==================== Volara-Miner 设置 ====================${RESET}"
+  # 每次显示菜单时加载并显示 logo
+  curl -s https://raw.githubusercontent.com/ziqing888/logo.sh/refs/heads/main/logo.sh | bash
+  echo -e "\n${BOLD}${BLUE}==================== Volara-Miner 设置 ====================${RESET}"
   echo "1. 更新和升级系统"
   echo "2. 安装 Docker"
   echo "3. 启动 Volara-Miner"
