@@ -18,28 +18,21 @@ SUCCESS_ICON="✅"
 WARNING_ICON="⚠️"
 ERROR_ICON="❌"
 
-# 定义日志文件路径
-LOG_FILE="/var/log/dusk_script.log"
-
 # 信息显示函数
 log_info() {
   echo -e "${CYAN}${INFO_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [信息] ${1}" >> "${LOG_FILE}"
 }
 
 log_success() {
   echo -e "${GREEN}${SUCCESS_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [成功] ${1}" >> "${LOG_FILE}"
 }
 
 log_warning() {
   echo -e "${YELLOW}${WARNING_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [警告] ${1}" >> "${LOG_FILE}"
 }
 
 log_error() {
   echo -e "${RED}${ERROR_ICON} ${1}${RESET}"
-  echo "$(date +'%Y-%m-%d %H:%M:%S') [错误] ${1}" >> "${LOG_FILE}"
 }
 
 # 函数：更新和升级系统
@@ -90,7 +83,7 @@ start_miner() {
   fi
 
   log_info "正在拉取 Volara-Miner Docker 镜像..."
-  docker pull volara/miner &> /dev/null
+  docker pull volara/miner
   if [[ $? -eq 0 ]]; then
     log_success "Volara-Miner Docker 镜像拉取成功。"
   else
@@ -122,8 +115,8 @@ view_miner_logs() {
 # 主菜单函数
 show_menu() {
   clear
-  # 每次显示菜单时加载并显示 logo
-  curl -s https://raw.githubusercontent.com/ziqing888/logo.sh/refs/heads/main/logo.sh | bash
+  # 每次显示菜单时加载并显示 logo，增加 5 秒超时
+  curl -m 5 -s https://raw.githubusercontent.com/ziqing888/logo.sh/refs/heads/main/logo.sh | bash
   echo -e "\n${BOLD}${BLUE}==================== Volara-Miner 设置 ====================${RESET}"
   echo "1. 更新和升级系统"
   echo "2. 安装 Docker"
@@ -160,3 +153,4 @@ while true; do
       ;;
   esac
 done
+
